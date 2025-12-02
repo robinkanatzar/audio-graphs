@@ -8,17 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+  var body: some View {
+    NavigationStack {
+      List(ExampleRoute.allCases) { route in
+        NavigationLink(route.title) {
+          route.destination
         }
-        .padding()
+      }
+      .navigationTitle("Audio Graph Examples")
     }
+  }
 }
 
 #Preview {
-    ContentView()
+  ContentView()
 }
