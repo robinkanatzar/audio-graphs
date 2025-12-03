@@ -11,5 +11,7 @@ final class SineWaveViewModel: ObservableObject {
   @Published var isPlaying = false
   @Published var frequency: Double = 440
   @Published var amplitude: Double = 0.5
+  let frequencyRange: ClosedRange<Double> = 220...880
+  let amplitudeRange: ClosedRange<Double> = 0...1
   
 }
