@@ -21,6 +21,10 @@ struct SineWaveView: View {
   }
 }
 
+private enum Layout {
+  static let sectionSpacing: CGFloat = 32
+  static let innerSpacing: CGFloat = 12
+}
 #Preview {
   SineWaveView()
 }
