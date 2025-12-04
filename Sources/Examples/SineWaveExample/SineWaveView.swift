@@ -56,7 +56,7 @@ struct SineWaveView: View {
       VStack(alignment: .leading, spacing: Layout.innerSpacing) {
         Text("Playback")
           .font(.headline)
-          .accessibilityAddTraits(.isHeader)
+          .accessibilityHidden(true)
         
         Toggle(isOn: $viewModel.isPlaying) {
           Text(viewModel.isPlaying ? "Playing" : "Stopped")
@@ -97,7 +97,7 @@ struct SineWaveView: View {
       VStack(alignment: .leading, spacing: Layout.innerSpacing) {
         Text(title)
           .font(.headline)
-          .accessibilityAddTraits(.isHeader)
+          .accessibilityHidden(true)
         
         Slider(value: value, in: range)
           .accessibilityLabel(title)
