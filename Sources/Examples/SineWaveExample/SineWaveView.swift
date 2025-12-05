@@ -17,7 +17,7 @@ import SwiftUI
 /// It is intended as a basic example for exploring Audio Graph–based
 /// sonification and accessibility behaviours.
 struct SineWaveView: View {
-  @StateObject private var viewModel = SineWaveViewModel()
+  @StateObject private var viewModel = SineWaveViewModel(player: AVSineWavePlayer())
   
   var body: some View {
     ScrollView {
