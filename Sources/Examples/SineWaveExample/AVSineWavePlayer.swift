@@ -27,7 +27,33 @@ class AVSineWavePlayer: SineWavePlayer {
   }
   
   private func configureGraph() {
+    let audioFormat = AVAudioFormat(
+      commonFormat: .pcmFormatFloat32,
+      sampleRate: sampleRate,
+      channels: 1,
+      interleaved: false)
     
+    let node = AVAudioSourceNode { _ , _, frameCount, audioBufferList -> OSStatus in
+      let audioBufferListPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
+      
+      for buffer in audioBufferListPointer {
+        let data = UnsafeMutableBufferPointer<Float>(buffer)
+        
+        for frame in 0..<Int(frameCount) {
+          let sample = sin(self.phase) * self.amplitude
+          data[frame] = Float(sample)
+          
+          self.phase += (2 * .pi * self.frequency) / self.sampleRate
+          if self.phase >= 2 * .pi { self.phase -= 2 * .pi}
+        }
+      }
+      return noErr
+    }
+    
+    engine.attach(node)
+    engine.connect(node, to: engine.mainMixerNode, format: audioFormat)
+    self.sourceNode = node
+    engine.prepare()
   }
   
   func start() {
