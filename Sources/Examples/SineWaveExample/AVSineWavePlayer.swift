@@ -26,6 +26,26 @@ class AVSineWavePlayer: SineWavePlayer {
     configureGraph()
   }
   
+  /// Configures the audio graph used to generate a continuous sine wave.
+  ///
+  /// The graph consists of:
+  /// - `AVAudioEngine` as the main processing graph
+  /// - `AVAudioSourceNode` which supplies PCM samples in real time
+  ///
+  /// How it works:
+  /// - The engine repeatedly calls the source node’s render block,
+  ///   requesting `frameCount` audio samples.
+  /// - For each frame, we compute:
+  ///       sample = sin(phase) * amplitude
+  /// - `phase` is advanced based on the desired frequency:
+  ///       phase += (2π * frequency) / sampleRate
+  /// - When the engine is running, these samples are streamed to the
+  ///   output, producing a smooth sine wave.
+  ///
+  /// Important:
+  /// - This callback must be real-time safe (no allocations, no locks).
+  /// - Audio is mono (1 channel) and uses Float32 PCM samples.
+  /// - `phase` wraps at 2π to avoid overflow.
   private func configureGraph() {
     let audioFormat = AVAudioFormat(
       commonFormat: .pcmFormatFloat32,
