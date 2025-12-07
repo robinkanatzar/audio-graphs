@@ -20,7 +20,7 @@ final class SineWaveViewModel: ObservableObject {
       guard !isInitializing else { return }
       player.frequency = frequency
       
-      guard !isPlaying else { return }
+      guard !isPlaying, shouldPlayFeedback() else { return }
       feedbackPlayer?.playFrequencyFeedback(frequency)
     }
   }
@@ -29,7 +29,7 @@ final class SineWaveViewModel: ObservableObject {
       guard !isInitializing else { return }
       player.amplitude = amplitude
       
-      guard !isPlaying else { return }
+      guard !isPlaying, shouldPlayFeedback() else { return }
       feedbackPlayer?.playAmplitudeFeedback(amplitude)
     }
   }
@@ -38,6 +38,7 @@ final class SineWaveViewModel: ObservableObject {
   let amplitudeRange: ClosedRange<Double> = 0...1
   
   private let feedbackPlayer: AudioFeedbackPlayer?
+  private var lastFeedbackTime = Date.distantPast
   
   init(player: SineWavePlayer, feedbackPlayer: AudioFeedbackPlayer? = nil) {
     self.player = player
@@ -46,5 +47,14 @@ final class SineWaveViewModel: ObservableObject {
     self.frequency = player.frequency
     self.amplitude = player.amplitude
     self.isInitializing = false
+  }
+  
+  private func shouldPlayFeedback(minInterval: TimeInterval = 0.1) -> Bool {
+    let now = Date()
+    guard now.timeIntervalSince(lastFeedbackTime) >= minInterval else {
+      return false
+    }
+    lastFeedbackTime = now
+    return true
   }
 }
