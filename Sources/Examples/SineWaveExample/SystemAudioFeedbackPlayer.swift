@@ -36,7 +36,7 @@ class SystemAudioFeedbackPlayer: AudioFeedbackPlayer {
     try? engine.start()
   }
   
-  func playFrequencyFeedback(_ frequency: Double) {
+  func playFrequencyFeedback(_ frequency: Double) {    
     let clamped = max(220, min(2000, frequency))
     
     guard let buffer = makeFeedbackTone(
@@ -77,26 +77,8 @@ class SystemAudioFeedbackPlayer: AudioFeedbackPlayer {
     var phase: Double = 0
     let phaseStep = (2.0 * .pi * frequency) / sampleRate
     
-    // Envelope: 10ms fade in/out
-    let fadeFrames = Int(sampleRate * 0.01) // 10ms
-    let totalFrames = Int(frameCount)
-    
-    for frame in 0..<totalFrames {
-      // base sine sample
-      var sample = sin(phase) * amplitude
-      
-      // apply envelope
-      if frame < fadeFrames {
-        // fade-in (0 → 1)
-        let fadeInFactor = Double(frame) / Double(fadeFrames)
-        sample *= fadeInFactor
-      } else if frame > totalFrames - fadeFrames {
-        // fade-out (1 → 0)
-        let fadeOutFactor = Double(totalFrames - frame) / Double(fadeFrames)
-        sample *= fadeOutFactor
-      }
-      
-      channelData?[frame] = Float(sample)
+    for frame in 0..<Int(frameCount) {
+      channelData?[frame] = Float(sin(phase) * amplitude)
       phase += phaseStep
     }
     
