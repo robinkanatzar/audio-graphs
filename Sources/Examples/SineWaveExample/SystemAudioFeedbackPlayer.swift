@@ -9,17 +9,30 @@ import Foundation
 import AVFoundation
 
 class SystemAudioFeedbackPlayer: AudioFeedbackPlayer {
-  private let engine = AVAudioEngine()
-  private let player = AVAudioPlayerNode()
-  private var format: AVAudioFormat
-  var targetFrequency: Double = 440
   
+  // MARK: - Private Types & Constants
+  
+  /// Audio constants used for feedback tone behaviour.
   private enum Constants {
+    /// Length of each feedback tone, in seconds.
     static let toneDuration: Double = 0.15
+    
+    /// Frequency used for amplitude feedback tones.
     static let amplitudeToneFrequency: Double = 600
+    
+    /// Default amplitude for frequency feedback tones.
     static let feedbackAmplitude: Double = 0.25
   }
   
+  private let engine = AVAudioEngine()
+  private let player = AVAudioPlayerNode()
+  private var format: AVAudioFormat
+  
+  // MARK: - Initialization
+  
+  /// Creates a new audio feedback engine and prepares it for playback.
+  ///
+  /// The engine starts immediately, but the player only plays when needed.
   init() {
     let session = AVAudioSession.sharedInstance()
     try? session.setCategory(.playback, mode: .default, options: [])
@@ -36,8 +49,14 @@ class SystemAudioFeedbackPlayer: AudioFeedbackPlayer {
     try? engine.start()
   }
   
-  func playFrequencyFeedback(_ frequency: Double) {    
-    let clamped = max(220, min(2000, frequency))
+  // MARK: - Public API (AudioFeedbackPlayer)
+  
+  /// Plays a short tone whose pitch reflects the given frequency.
+  ///
+  /// - Parameter frequency: Hertz value to sonify.
+  ///   Values are safely clamped to 220–880 Hz.
+  func playFrequencyFeedback(_ frequency: Double) {
+    let clamped = max(220, min(880, frequency))
     
     guard let buffer = makeFeedbackTone(
       frequency: clamped,
@@ -49,6 +68,10 @@ class SystemAudioFeedbackPlayer: AudioFeedbackPlayer {
     player.scheduleBuffer(buffer, at: nil, options: .interrupts, completionHandler: nil)
   }
   
+  // Plays a short tone whose loudness reflects amplitude changes.
+  ///
+  /// - Parameter amplitude: Slider value (0.0–1.0).
+  ///   Mapped to a perceptible 0.1–0.5 audio amplitude.
   func playAmplitudeFeedback(_ amplitude: Double) {
     // Clamp 0...1 and map to a subtle 0.1...0.5 amplitude
     let clamped = max(0.0, min(1.0, amplitude))
@@ -64,6 +87,17 @@ class SystemAudioFeedbackPlayer: AudioFeedbackPlayer {
     player.scheduleBuffer(buffer, at: nil, options: .interrupts, completionHandler: nil)
   }
   
+  // MARK: - Tone Generation
+  
+  /// Creates a short PCM buffer containing a sine wave tone.
+  /// Feedback tones are only triggered when the main sine-wave generator is not running.
+  /// This prevents audio overlap and keeps the soundscape clean.
+  ///
+  /// - Parameters:
+  ///   - frequency: Tone frequency in Hz.
+  ///   - amplitude: Output amplitude (0.0–1.0).
+  ///
+  /// - Returns: A PCM buffer ready for playback, or `nil` if allocation failed.
   private func makeFeedbackTone(frequency: Double, amplitude: Double) -> AVAudioPCMBuffer? {
     let sampleRate = format.sampleRate
     let frameCount = AVAudioFrameCount(sampleRate * Constants.toneDuration)
@@ -86,6 +120,7 @@ class SystemAudioFeedbackPlayer: AudioFeedbackPlayer {
   }
 }
 
+/// Convenience helper that ensures the audio player starts if needed.
 private extension AVAudioPlayerNode {
   func playIfNeeded() {
     if !isPlaying {
