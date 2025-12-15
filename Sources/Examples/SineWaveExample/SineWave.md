@@ -43,6 +43,16 @@ The user can start, stop, and control the properties of the generated sine wave.
 
 ---
 
+### Scenario 4 – Lifecycle & Navigation Handling
+
+**Given** the sine wave is playing
+**When** the app moves to the background
+**Then** audio playback should stop safely
+**And** when the user navigates away from the Sine Wave screen
+**Then** the audio engine should stop
+**And** audio resources should be released
+
+
 ## Constraints
 - The UI must not block audio rendering.
 - Rendering must occur in a real-time safe callback.

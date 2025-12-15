@@ -57,4 +57,10 @@ final class SineWaveViewModel: ObservableObject {
     lastFeedbackTime = now
     return true
   }
+  
+  func stopAudio() {
+    guard isPlaying else { return }
+    isPlaying = false
+    player.stop()
+  }
 }
