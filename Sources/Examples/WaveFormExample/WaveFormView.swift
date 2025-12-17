@@ -8,11 +8,34 @@
 import SwiftUI
 
 struct WaveFormView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+  @StateObject private var viewModel = WaveFormViewModel()
+  
+  var body: some View {
+    VStack {
+      Canvas { context, size in
+        guard !viewModel.amplitudes.isEmpty else { return }
+        
+        let barWidth = size.width / CGFloat(viewModel.amplitudes.count)
+        
+        for (index, amplitude) in viewModel.amplitudes.enumerated() {
+          let height = size.height * CGFloat(amplitude)
+          let x = CGFloat(index) * barWidth
+          let y = size.height - height
+          
+          let rect = CGRect(x: x, y: y, width: barWidth, height: height)
+          context.fill(Path(rect), with: .color(.blue))
+        }
+      }
+      .frame(height: 150)
+      
+      Button("Generate Waveform") {
+        viewModel.generateSampleData()
+      }
     }
+    .padding()
+  }
 }
 
 #Preview {
-    WaveFormView()
+  WaveFormView()
 }
