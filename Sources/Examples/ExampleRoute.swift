@@ -10,13 +10,14 @@ import SwiftUI
 /// Defines all available example routes in the app.
 /// Add new cases here to automatically include them in the examples list.
 enum ExampleRoute: String, CaseIterable, Identifiable {
-  case sineWave
+  case sineWave, waveForm
   
   var id: Self { self }
   
   var title: String {
     switch self {
     case .sineWave: "Sine Wave"
+    case .waveForm: "Wave Form"
     }
   }
   
@@ -24,6 +25,7 @@ enum ExampleRoute: String, CaseIterable, Identifiable {
   var destination: some View {
     switch self {
     case .sineWave: SineWaveView()
+    case .waveForm: WaveFormView()
     }
   }
 }
