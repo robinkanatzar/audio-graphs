@@ -30,6 +30,8 @@ struct WaveFormView: View {
       .onAppear {
         viewModel.generateSampleData()
       }
+      .accessibilityElement(children: .ignore)
+      .accessibilityHint("Represents the audio signal over time")
     }
     .padding()
   }
