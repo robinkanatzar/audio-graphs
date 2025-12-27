@@ -27,8 +27,7 @@ struct WaveFormView: View {
         }
       }
       .frame(height: 150)
-      
-      Button("Generate Waveform") {
+      .onAppear {
         viewModel.generateSampleData()
       }
     }
