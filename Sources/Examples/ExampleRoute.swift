@@ -21,6 +21,7 @@ enum ExampleRoute: String, CaseIterable, Identifiable {
     }
   }
   
+  @MainActor
   @ViewBuilder
   var destination: some View {
     switch self {
