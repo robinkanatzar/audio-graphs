@@ -6,17 +6,30 @@
 //
 import Foundation
 
-final class WaveFormViewModel: ObservableObject {
-  let amplitudeRange: ClosedRange<Double> = 0.0...1.0
+@MainActor
+final class WaveFormViewModel: ObservableObject, WaveFormOutput {
   
   @Published private(set) var amplitudes: [Float] = []
+  let sineWavePlayer: AVSineWavePlayer?
   
-  func generateSampleData() {
-    amplitudes = (0..<200).map { index in
-      let phase = Double(index) / 200.0
-      let sineValue = sin(phase * 2 * .pi)
-      let normalized = (sineValue + 1) / 2
-      return Float(normalized)
+  init(_ player: AVSineWavePlayer = AVSineWavePlayer(enableModulation: true)) {
+    self.sineWavePlayer = player
+  }
+  
+  nonisolated func didReceiveWaveform(_ amplitudeValues: [Float]) {
+    Task { @MainActor in
+      self.amplitudes = amplitudeValues
     }
+  }
+  
+  func startPlayer() {
+    sineWavePlayer?.lfoFrequency = 3.0
+    sineWavePlayer?.lfoDepth = 0.5
+    sineWavePlayer?.waveformOutput = self
+    sineWavePlayer?.start()
+  }
+  
+  func stopPlayer() {
+    sineWavePlayer?.stop()
   }
 }

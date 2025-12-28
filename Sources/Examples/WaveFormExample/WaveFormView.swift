@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct WaveFormView: View {
+  
   @StateObject private var viewModel = WaveFormViewModel()
   
   var body: some View {
@@ -17,24 +18,25 @@ struct WaveFormView: View {
         
         let barWidth = size.width / CGFloat(viewModel.amplitudes.count)
         
-        for (index, amplitude) in viewModel.amplitudes.enumerated() {
-          let height = size.height * CGFloat(amplitude)
-          let x = CGFloat(index) * barWidth
-          let y = size.height - height
-          
-          let rect = CGRect(x: x, y: y, width: barWidth, height: height)
+        for (index, amp) in viewModel.amplitudes.enumerated() {
+          let height = size.height * CGFloat(amp)
+          let rect = CGRect(
+            x: CGFloat(index) * barWidth,
+            y: size.height - height,
+            width: barWidth,
+            height: height
+          )
           context.fill(Path(rect), with: .color(.blue))
         }
       }
       .frame(height: 150)
-      .onAppear {
-        viewModel.generateSampleData()
-      }
-      .accessibilityElement(children: .ignore)
-      .accessibilityLabel("Waveform visualization")
-      .accessibilityHint("Represents the audio signal over time")
     }
-    .padding()
+    .onAppear {
+      viewModel.startPlayer()
+    }
+    .onDisappear {
+      viewModel.stopPlayer()
+    }
   }
 }
 
